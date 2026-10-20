@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "249331247240",
+    "project_id": "smart-sensory-assist-sho-29a3b",
+    "storage_bucket": "smart-sensory-assist-sho-29a3b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249331247240:android:14f2a59190e7c7ea50973d",
+        "android_client_info": {
+          "package_name": "com.smartshoe.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyFN5K5FQ6F1_QdzZB8ZILO3xcqbsplcs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
