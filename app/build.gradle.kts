@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
 }
 android {
     namespace = "com.smartshoe.app"
@@ -41,17 +42,14 @@ dependencies {
 
             // Compose BOM
             implementation(platform(libs.androidx.compose.bom))
-// Firebase BoM (Bill of Materials) - recommended for managing Firebase versions
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-
-    // Firebase Cloud Messaging
-    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("androidx.appcompat:appcompat:1.6.1")
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.compose.material3)
             implementation(libs.androidx.compose.ui)
             implementation(libs.androidx.compose.ui.graphics)
             implementation(libs.androidx.compose.ui.tooling.preview)
-
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.lifecycle.runtime.ktx)
 

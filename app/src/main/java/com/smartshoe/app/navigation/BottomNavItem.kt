@@ -13,9 +13,34 @@ sealed class BottomNavItem(
     val title: String,
     val icon: ImageVector
 ) {
-    object Home : BottomNavItem("dashboard", "Dashboard", Icons.Default.Home)
-    object GPS : BottomNavItem("gps", "GPS", Icons.Default.LocationOn)
-    object SOS : BottomNavItem("sos", "SOS", Icons.Default.Warning)
-    object Notifications : BottomNavItem("notifications", "Notifications", Icons.Default.Notifications)
-    object Profile : BottomNavItem("profile", "Profile", Icons.Default.AccountCircle)
+
+    object Home : BottomNavItem(
+        "dashboard",
+        "Home",
+        Icons.Default.Home
+    )
+
+    object GPS : BottomNavItem(
+        "gps",
+        "GPS",
+        Icons.Default.LocationOn
+    )
+
+    object SOS : BottomNavItem(
+        "sos",
+        "SOS",
+        Icons.Default.Warning
+    )
+
+    object Notifications : BottomNavItem(
+        "notifications",
+        "Notifications",
+        Icons.Default.Notifications
+    )
+
+    object Profile : BottomNavItem(
+        "profile",
+        "Profile",
+        Icons.Default.AccountCircle
+    )
 }

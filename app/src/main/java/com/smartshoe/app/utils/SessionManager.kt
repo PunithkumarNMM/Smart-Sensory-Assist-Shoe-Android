@@ -31,18 +31,6 @@ class SessionManager(context: Context) {
         prefs.edit().remove("deviceId").apply()
     }
 
-    // ==========================
-    // GUARDIAN PHONE NUMBER
-    // ==========================
-
-    fun saveGuardianPhone(phone: String) {
-        prefs.edit().putString("guardianPhone", phone).apply()
-    }
-
-    fun getGuardianPhone(): String? {
-        return prefs.getString("guardianPhone", null)
-    }
-
     fun clearSession() {
         prefs.edit().clear().apply()
     }
