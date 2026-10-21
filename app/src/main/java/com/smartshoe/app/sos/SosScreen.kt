@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,19 +30,18 @@ import com.smartshoe.app.network.RetrofitClient
 import com.smartshoe.app.utils.SessionManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.animation.AnimatedVisibility
 
 @Composable
 fun SosScreen(
     navController: NavController
 ) {
-
     val context = navController.context
     val scope = rememberCoroutineScope()
-    var loading = remember { mutableStateOf(false) }
-    var showDialog = remember { mutableStateOf(false) }
-    var countdown = remember { mutableIntStateOf(3) }
-    var startCountdown = remember { mutableStateOf(false) }
+
+    var loading by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var countdown by remember { mutableIntStateOf(3) }
+    var startCountdown by remember { mutableStateOf(false) }
 
     val pulse = rememberInfiniteTransition(label = "pulse")
 
@@ -49,10 +49,7 @@ fun SosScreen(
         initialValue = 1f,
         targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
-            animation = tween(
-                900,
-                easing = FastOutSlowInEasing
-            ),
+            animation = tween(900, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "scale"
@@ -78,32 +75,30 @@ fun SosScreen(
         label = "flash"
     )
 
-    LaunchedEffect(startCountdown.value) {
-        if (!startCountdown.value) return@LaunchedEffect
-
-        countdown.intValue = 3
-
-        while (countdown.intValue > 0) {
+    // Handle Countdown Timer logic
+    LaunchedEffect(startCountdown) {
+        if (!startCountdown) return@LaunchedEffect
+        countdown = 3
+        while (countdown > 0) {
             delay(1000)
-            countdown.intValue--
+            countdown--
         }
-
-        startCountdown.value = false
-        showDialog.value = true
+        startCountdown = false
+        showDialog = true
     }
 
-    val locationPermissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission()
-        ) { granted ->
-            if (!granted) {
-                Toast.makeText(
-                    context,
-                    "Location permission is required",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+    // Permission launcher for Location access
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (!granted) {
+            Toast.makeText(
+                context,
+                "Location permission is required to attach GPS to SOS",
+                Toast.LENGTH_LONG
+            ).show()
         }
+    }
 
     Box(
         modifier = Modifier
@@ -125,6 +120,7 @@ fun SosScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+
             Text(
                 text = "🚨 EMERGENCY",
                 fontSize = 34.sp,
@@ -142,6 +138,7 @@ fun SosScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
+            // Pulse SOS Button Area
             Box(
                 modifier = Modifier.size(260.dp),
                 contentAlignment = Alignment.Center
@@ -163,24 +160,29 @@ fun SosScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFD32F2F)
                     ),
+                    enabled = !loading && !startCountdown,
                     onClick = {
-                        if (!loading.value) {
-                            startCountdown.value = true
-                        }
+                        startCountdown = true
                     }
                 ) {
-                    Text(
-                        text = "SOS",
-                        fontSize = 44.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
-                    )
+                    if (loading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "SOS",
+                            fontSize = 44.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
+                        )
+                    }
                 }
             }
 
-            AnimatedVisibility(
-                visible = startCountdown.value
-            ) {
+            // Countdown Indicator and Cancel option
+            AnimatedVisibility(visible = startCountdown) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -195,16 +197,26 @@ fun SosScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "${countdown.intValue}",
+                        text = "$countdown",
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Yellow
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedButton(
+                        onClick = { startCountdown = false },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                    ) {
+                        Text("CANCEL")
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(35.dp))
 
+            // Action Features Checklist Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -224,130 +236,112 @@ fun SosScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(text = "📍 Live GPS Location", color = Color.White)
+                    Text(text = "📍 Live GPS Location Attachment", color = Color.White)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "📲 Notify Guardians & SMS", color = Color.White)
+                    Text(text = "📲 Automatic Guardian Notification", color = Color.White)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "🚑 Save SOS History", color = Color.White)
+                    Text(text = "🚑 SOS Log Persistence", color = Color.White)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "🔔 Push Emergency Notification", color = Color.White)
+                    Text(text = "🔔 Real-time Emergency Dispatch", color = Color.White)
                 }
             }
         }
     }
 
-    if (showDialog.value) {
+    // Confirmation Alert Dialog
+    if (showDialog) {
         AlertDialog(
             onDismissRequest = {
-                showDialog.value = false
+                showDialog = false
             },
             title = {
                 Text("🚨 Confirm Emergency SOS")
             },
             text = {
-                Text("Your live location will be shared with guardians and an emergency SMS will be sent.\n\nDo you want to continue?")
+                Text("Your live location will be shared with all registered guardians and emergency services.\n\nDo you want to proceed?")
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        showDialog.value = false
-                        loading.value = true
+                        showDialog = false
+                        loading = true
 
                         val session = SessionManager(context)
                         val deviceId = session.getDeviceId()
 
                         if (deviceId.isNullOrEmpty()) {
-                            loading.value = false
+                            loading = false
                             Toast.makeText(
                                 context,
-                                "No Device Registered",
+                                "No registered device found! Please register a device first.",
                                 Toast.LENGTH_LONG
                             ).show()
                             return@Button
                         }
 
-                        if (
-                            ContextCompat.checkSelfPermission(
+                        // Verify Location Permission
+                        if (ContextCompat.checkSelfPermission(
                                 context,
                                 Manifest.permission.ACCESS_FINE_LOCATION
                             ) != PackageManager.PERMISSION_GRANTED
                         ) {
-                            loading.value = false
-                            locationPermissionLauncher.launch(
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            )
+                            loading = false
+                            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                             return@Button
                         }
 
+                        // Fetch Location and Dispatch API call
                         LocationHelper.getCurrentLocation(
                             context,
                             onSuccess = { latitude, longitude ->
                                 scope.launch {
                                     try {
-                                        // 1. Send SOS via Cloud Backend (Retrofit / MongoDB)
                                         val response = RetrofitClient.api.sendSOS(
                                             SOSRequest(
-                                                deviceId,
-                                                latitude,
-                                                longitude,
-                                                "🚨 Emergency! Please Help."
+                                                deviceId = deviceId,
+                                                latitude = latitude,
+                                                longitude = longitude,
+                                                message = "🚨 Emergency! Please Help."
                                             )
                                         )
 
-                                        // 2. Retrieve dynamic guardian phone number from SessionManager
-                                        val registeredGuardianNumber = session.getGuardianPhone()
+                                        loading = false
 
-                                        val targetNumber = if (!registeredGuardianNumber.isNullOrEmpty()) {
-                                            registeredGuardianNumber
-                                        } else {
-                                            "+917975855460" // Updated fallback to your real guardian number
-                                        }
-
-                                        val smsMessage = "🚨 EMERGENCY! I need help. My live location: https://maps.google.com/?q=$latitude,$longitude"
-
-                                        // 3. Trigger Direct Local SMS to the target number
-                                        (context as? com.smartshoe.app.MainActivity)?.checkAndSendSos(targetNumber, smsMessage)
-
-                                        loading.value = false
-
-                                        val sosResponse = response.body()
-
-                                        if (response.isSuccessful && sosResponse?.success == true) {
+                                        if (response.isSuccessful) {
                                             Toast.makeText(
                                                 context,
-                                                "✅ SOS sent via Cloud & Local SMS!",
+                                                "✅ Emergency Alert Sent Successfully!",
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         } else {
                                             Toast.makeText(
                                                 context,
-                                                "⚠️ Local SMS triggered, but cloud sync returned an issue.",
+                                                "❌ Failed to dispatch SOS (${response.code()})",
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
-
                                     } catch (e: Exception) {
-                                        loading.value = false
+                                        loading = false
                                         Toast.makeText(
                                             context,
-                                            e.message,
+                                            "Connection Error: ${e.message}",
                                             Toast.LENGTH_LONG
                                         ).show()
                                     }
                                 }
                             },
-                            onFailure = { errorMsg ->
-                                loading.value = false
+                            onFailure = { error ->
+                                loading = false
                                 Toast.makeText(
                                     context,
-                                    errorMsg,
+                                    "Location Error: $error",
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
                         )
                     }
                 ) {
-                    if (loading.value) {
+                    if (loading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(22.dp),
                             color = Color.White,
@@ -360,9 +354,7 @@ fun SosScreen(
             },
             dismissButton = {
                 OutlinedButton(
-                    onClick = {
-                        showDialog.value = false
-                    }
+                    onClick = { showDialog = false }
                 ) {
                     Text("Cancel")
                 }

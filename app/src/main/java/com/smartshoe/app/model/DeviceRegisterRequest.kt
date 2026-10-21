@@ -1,4 +1,5 @@
-package com.smartshoe.app.model
+
+package com.smartshoe.app.models
 
 data class DeviceRegisterRequest(
     val shoeName: String,

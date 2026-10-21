@@ -1,3 +1,4 @@
+
 package com.smartshoe.app.navigation
 
 import androidx.compose.foundation.layout.padding
@@ -6,16 +7,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.smartshoe.app.bottomnav.BottomBar
+import com.smartshoe.app.bottomnav.BottomNavGraph
 
 @Composable
-fun MainScreen(rootNavController: NavHostController) {
+fun MainScreen() {
     val bottomNavController = rememberNavController()
 
-    Surface(
-        color = Color(0xFFF7F9FC)
-    ) {
+    Surface(color = Color(0xFFF7F9FC)) {
         Scaffold(
             containerColor = Color.Transparent,
             bottomBar = {
@@ -24,10 +24,7 @@ fun MainScreen(rootNavController: NavHostController) {
         ) { padding ->
             BottomNavGraph(
                 navController = bottomNavController,
-                rootNavController = rootNavController,
-                modifier = Modifier.padding(
-                    bottom = padding.calculateBottomPadding()
-                )
+                modifier = Modifier.padding(padding)
             )
         }
     }

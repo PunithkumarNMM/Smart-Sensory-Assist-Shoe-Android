@@ -1,7 +1,7 @@
 package com.smartshoe.app.network
 
 import com.smartshoe.app.model.DeleteResponse
-import com.smartshoe.app.model.DeviceRegisterRequest
+import com.smartshoe.app.models.DeviceRegisterRequest
 import com.smartshoe.app.model.DeviceRegisterResponse
 import com.smartshoe.app.model.ForgotPasswordRequest
 import com.smartshoe.app.model.ForgotPasswordResponse
@@ -32,7 +32,11 @@ import com.smartshoe.app.model.UploadResponse
 import com.smartshoe.app.dashboard.DashboardResponse
 import com.smartshoe.app.gps.LocationResponse
 import com.smartshoe.app.device.DeviceResponse
-import com.smartshoe.app.geofence.GeofenceResponse
+import com.smartshoe.app.model.UpdateDeviceRequest
+import retrofit2.http.Body
+import retrofit2.http.PUT
+
+
 interface ApiService {
     data class CameraStatusResponse(
         val online: Boolean,
@@ -42,6 +46,11 @@ interface ApiService {
     // ==========================
     // AUTH APIs
     // ==========================
+
+    @PUT("api/auth/update-device")
+    suspend fun updateDevice(
+        @Body request: UpdateDeviceRequest
+    ): Response<ResponseBody>
 
     @POST("api/auth/login")
     suspend fun login(
@@ -112,12 +121,7 @@ interface ApiService {
     // ==========================
     // GUARDIAN APIs
     // ==========================
-// ==========================
-// GEOFENCE APIs
-// ==========================
 
-    @GET("api/geofences")
-    suspend fun getGeofences(): Response<GeofenceResponse>
     @GET("api/guardians")
     suspend fun getGuardians(): Response<GuardianResponse>
 
@@ -163,7 +167,7 @@ interface ApiService {
     suspend fun getDashboard(
         @Path("deviceId") deviceId: String
     ): Response<DashboardResponse>
-    @GET("api/gps/live/{deviceId}")
+    @GET("api/location/live/{deviceId}")
     suspend fun getLiveLocation(
         @Path("deviceId") deviceId: String
     ): Response<LocationResponse>
